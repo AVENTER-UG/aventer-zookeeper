@@ -1,17 +1,17 @@
-NAME      ?= mesosphere-zookeeper
+NAME      ?= aventer-zookeeper
 SHELL     := /bin/bash
 EMPTY     :=
 SPACE     := $(EMPTY) $(EMPTY)
-PKG_VER   ?= 3.4.6
+PKG_VER   ?= 3.5.8
 REL_MAJOR ?= 0
 REL_MINOR ?= 1
 REL_PATCH ?= $(shell date -u +'%Y%m%d%H%M%S')
 ITEMS     := $(REL_MAJOR) $(REL_MINOR) $(REL_PATCH)
 PKG_REL   := $(subst $(SPACE),.,$(strip $(ITEMS)))
-ZK_URL    ?= http://mirror.cogentco.com/pub/apache/zookeeper/stable/zookeeper-$(PKG_VER).tar.gz 
+ZK_URL    ?= http://mirror.cogentco.com/pub/apache/zookeeper/stable/apache-zookeeper-$(PKG_VER)-bin.tar.gz 
 SRC_TGZ    = $(notdir $(ZK_URL))
-CONTENTS  := opt/mesosphere/zookeeper/bin opt/mesosphere/zookeeper/lib \
-	opt/mesosphere/zookeeper/zookeeper-$(PKG_VER).jar usr etc
+CONTENTS  := opt/zookeeper/bin opt/zookeeper/lib \
+	opt/zookeeper/lib/zookeeper-$(PKG_VER).jar usr etc
 
 TOP       := $(CURDIR)
 CACHE      = $(TOP)/tmp/cache
@@ -32,12 +32,13 @@ FPM_OPTS := -t rpm -s dir -n $(NAME) -v $(PKG_VER) \
 	-d 'java >= 1.6' \
 	--conflicts zookeeper \
 	--conflicts zookeeper-server \
+	--conflicts mesosphere-zookeeper \
 	--architecture native \
-	--url "http://www.mesosphere.com" \
+	--url "https://www.aventer.biz" \
 	--license Apache-2.0 \
 	--description "High-performance coordination service for distributed applications" \
-	--maintainer "Mesosphere Package Builder <support@mesosphere.io>" \
-	--vendor "Mesosphere, Inc."
+	--maintainer "AVENTER Support <support@aventer.biz>" \
+	--vendor "AVENTER UG (haftungsbeschraenkt)"
 
 $(CACHE):
 	mkdir -p $(CACHE)
@@ -54,8 +55,8 @@ fetch: $(CACHE)
 
 .PHONY: extract
 extract: fetch $(TOOR)
-	mkdir -p "$(TOOR)"/opt/mesosphere/zookeeper
-	cd "$(TOOR)"/opt/mesosphere/zookeeper && tar xzf "$(CACHE)/$(SRC_TGZ)" --strip=1
+	mkdir -p "$(TOOR)"/opt/zookeeper
+	cd "$(TOOR)"/opt/zookeeper && tar xzf "$(CACHE)/$(SRC_TGZ)" --strip=1
 
 .PHONY: clean
 clean:
@@ -65,8 +66,15 @@ clean:
 distclean: clean
 	rm -rf $(PKG)
 
+.PHONY: req
+req: 
+	yum install centos-release-scl
+	yum install rh-ruby23 rh-ruby23-ruby-devel gcc make rpm-build rubygems
+	scl enable rh-ruby23 bash
+	gem install --no-document fpm
+
 .PHONY: all
-all: centos7
+all: req centos7
 
 .PHONY: centos7
 centos7: extract $(PKG)
@@ -79,7 +87,7 @@ centos7: $(TOOR)/etc/zookeeper/conf/zoo.cfg
 
 $(TOOR)/etc/zookeeper/conf/zoo.cfg: zoo.cfg extract $(TOOR)
 	mkdir -p $(TOOR)/etc/zookeeper/conf
-	cp -rp $(TOOR)/opt/mesosphere/zookeeper/conf/* $(TOOR)/etc/zookeeper/conf/
+	cp -rp $(TOOR)/opt/zookeeper/conf/* $(TOOR)/etc/zookeeper/conf/
 	cp zoo.cfg "$@"
 
 $(TOOR)/usr/lib/systemd/system/zookeeper.service: zookeeper.service

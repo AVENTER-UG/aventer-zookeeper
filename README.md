@@ -1,7 +1,7 @@
-mesosphere-zookeeper
+aventer-zookeeper
 ====================
 
-Packaging utilities for mesosphere-zookeeper
+Packaging utilities for aventer-zookeeper
 
 Set Up
 ------
