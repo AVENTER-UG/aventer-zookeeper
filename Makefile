@@ -74,7 +74,7 @@ req:
 	gem install --no-document fpm
 
 .PHONY: all
-all: req centos7
+all: req centos7 almalinux8
 
 .PHONY: centos7
 centos7: extract $(PKG)
@@ -83,6 +83,15 @@ centos7: $(TOOR)/etc/zookeeper/conf/zoo.cfg
 	cd $(PKG) && fpm -C $(TOOR) \
 		--config-files etc \
 		--after-install $(TOP)/postinst --iteration $(PKG_REL).centos7 \
+		$(FPM_OPTS) $(CONTENTS)
+
+.PHONY: almalinux8
+almalinux8: extract $(PKG)
+almalinux8: $(TOOR)/usr/lib/systemd/system/zookeeper.service
+almalinux8: $(TOOR)/etc/zookeeper/conf/zoo.cfg
+	cd $(PKG) && fpm -C $(TOOR) \
+		--config-files etc \
+		--after-install $(TOP)/postinst --iteration $(PKG_REL).almalinux8 \
 		$(FPM_OPTS) $(CONTENTS)
 
 $(TOOR)/etc/zookeeper/conf/zoo.cfg: zoo.cfg extract $(TOOR)
