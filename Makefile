@@ -2,13 +2,13 @@ NAME      ?= aventer-zookeeper
 SHELL     := /bin/bash
 EMPTY     :=
 SPACE     := $(EMPTY) $(EMPTY)
-PKG_VER   ?= 3.6.3
+PKG_VER   ?= 3.7.0
 REL_MAJOR ?= 0
 REL_MINOR ?= 1
 REL_PATCH ?= $(shell date -u +'%Y%m%d%H%M%S')
 ITEMS     := $(REL_MAJOR) $(REL_MINOR) $(REL_PATCH)
 PKG_REL   := $(subst $(SPACE),.,$(strip $(ITEMS)))
-ZK_URL    ?= http://mirror.cogentco.com/pub/apache/zookeeper/stable/apache-zookeeper-$(PKG_VER)-bin.tar.gz 
+ZK_URL    ?= http://mirror.cogentco.com/pub/apache/zookeeper/current/apache-zookeeper-$(PKG_VER)-bin.tar.gz 
 SRC_TGZ    = $(notdir $(ZK_URL))
 CONTENTS  := opt/zookeeper/bin opt/zookeeper/lib \
 	opt/zookeeper/lib/zookeeper-$(PKG_VER).jar usr etc
@@ -52,6 +52,10 @@ $(PKG):
 .PHONY: fetch
 fetch: $(CACHE)
 	cd $(CACHE); wget -N $(ZK_URL)
+	cd $(CACHE); tar -xvf apache-zookeeper-$(PKG_VER)-bin.tar.gz 
+	## FIX https://github.com/apache/logging-log4j2/pull/608 (log4j)  						CVE-2021-44228
+	cd $(CACHE); zip -q -d apache-zookeeper-$(PKG_VER)-bin/lib/log4j-1.2.17.jar org/apache/log4j/net/JMSAppender.class
+	cd $(CACHE); tar -czf apache-zookeeper-3.7.0-bin.tar.gz apache-zookeeper-3.7.0-bin/
 
 .PHONY: extract
 extract: fetch $(TOOR)
@@ -60,6 +64,8 @@ extract: fetch $(TOOR)
 
 .PHONY: clean
 clean:
+	rm -rf apache-zookeeper-$(PKG_VER)*
+	rm -rf *.rpm
 	rm -rf tmp
 
 .PHONY: distclean
@@ -68,8 +74,6 @@ distclean: clean
 
 .PHONY: req
 req: 
-	yum install centos-release-scl
-	yum install rh-ruby23 rh-ruby23-ruby-devel gcc make rpm-build rubygems
 	scl enable rh-ruby23 bash
 	gem install --no-document fpm
 
