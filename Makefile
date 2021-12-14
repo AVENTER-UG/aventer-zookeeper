@@ -72,13 +72,17 @@ clean:
 distclean: clean
 	rm -rf $(PKG)
 
-.PHONY: req
-req: 
+.PHONY: reqcentos
+reqcentos: 
 	scl enable rh-ruby23 bash
 	gem install --no-document fpm
 
+.PHONY: reqalmalinux
+reqalmalinux: 
+	gem install --no-document fpm
+
 .PHONY: all
-all: req centos7 almalinux8
+all: centos7 almalinux8
 
 .PHONY: centos7
 centos7: extract $(PKG)
