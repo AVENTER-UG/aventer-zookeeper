@@ -2,7 +2,6 @@
 Description=Apache ZooKeeper
 After=network.target
 ConditionPathExists=/etc/zookeeper/conf/zoo.cfg
-ConditionPathExists=/etc/zookeeper/conf/log4j.properties
 
 [Service]
 Environment="ZOOCFGDIR=/etc/zookeeper/conf"
