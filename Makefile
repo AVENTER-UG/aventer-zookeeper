@@ -28,7 +28,7 @@ help:
 	@echo "  => pkg/mesosphere-zookeeper-3.4.6-1.0.0.centos7.x86_64.rpm"
 	@exit 0
 
-FPM_OPTS := -t rpm -s dir -n $(NAME) -v $(PKG_VER) \
+FPM_OPTS := -s dir -n $(NAME) -v $(PKG_VER) \
 	-d 'java >= 1.6' \
 	--conflicts zookeeper \
 	--conflicts zookeeper-server \
@@ -78,7 +78,7 @@ reqalmalinux:
 	gem install --no-document fpm
 
 .PHONY: all
-all: centos7 almalinux8
+all: centos7 almalinux8 ubuntu
 
 .PHONY: centos7
 centos7: extract $(PKG)
@@ -86,7 +86,7 @@ centos7: $(TOOR)/usr/lib/systemd/system/zookeeper.service
 centos7: $(TOOR)/etc/zookeeper/conf/zoo.cfg
 	cd $(PKG) && fpm -C $(TOOR) \
 		--config-files etc \
-		--after-install $(TOP)/postinst --iteration $(PKG_REL).centos7 \
+		--after-install $(TOP)/postinst --iteration $(PKG_REL).centos7 -t rpm \
 		$(FPM_OPTS) $(CONTENTS)
 
 .PHONY: almalinux8
@@ -95,7 +95,16 @@ almalinux8: $(TOOR)/usr/lib/systemd/system/zookeeper.service
 almalinux8: $(TOOR)/etc/zookeeper/conf/zoo.cfg
 	cd $(PKG) && fpm -C $(TOOR) \
 		--config-files etc \
-		--after-install $(TOP)/postinst --iteration $(PKG_REL).almalinux8 \
+		--after-install $(TOP)/postinst --iteration $(PKG_REL).almalinux8 -t rpm \
+		$(FPM_OPTS) $(CONTENTS)
+
+.PHONY: ubuntu
+ubuntu: extract $(PKG)
+ubuntu: $(TOOR)/usr/lib/systemd/system/zookeeper.service
+ubuntu: $(TOOR)/etc/zookeeper/conf/zoo.cfg
+	cd $(PKG) && fpm -C $(TOOR) \
+		--config-files etc \
+		--after-install $(TOP)/postinst --iteration $(PKG_REL).almalinux8 -t deb \
 		$(FPM_OPTS) $(CONTENTS)
 
 $(TOOR)/etc/zookeeper/conf/zoo.cfg: zoo.cfg extract $(TOOR)
@@ -111,3 +120,4 @@ $(TOOR)/usr/lib/systemd/system/zookeeper.service: zookeeper.service
 prep-ubuntu:
 	sudo apt-get -y install ruby-dev rpm
 	sudo gem install fpm
+
