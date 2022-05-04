@@ -6,7 +6,7 @@ PKG_VER   ?= 3.8.0
 REL_MAJOR ?= 0
 REL_MINOR ?= 1
 REL_PATCH ?= $(shell date -u +'%Y%m%d%H%M%S')
-ITEMS     := $(REL_MAJOR) $(REL_MINOR) $(REL_PATCH)
+ITEMS     := $(REL_MAJOR) $(REL_MINOR)
 PKG_REL   := $(subst $(SPACE),.,$(strip $(ITEMS)))
 ZK_URL    ?= https://dlcdn.apache.org/zookeeper/zookeeper-${PKG_VER}/apache-zookeeper-${PKG_VER}-bin.tar.gz
 SRC_TGZ    = $(notdir $(ZK_URL))
@@ -104,7 +104,7 @@ ubuntu: $(TOOR)/usr/lib/systemd/system/zookeeper.service
 ubuntu: $(TOOR)/etc/zookeeper/conf/zoo.cfg
 	cd $(PKG) && fpm -C $(TOOR) \
 		--config-files etc \
-		--after-install $(TOP)/postinst --iteration $(PKG_REL).almalinux8 -t deb \
+		--after-install $(TOP)/postinst --iteration $(PKG_REL).ubuntu -t deb \
 		$(FPM_OPTS) $(CONTENTS)
 
 $(TOOR)/etc/zookeeper/conf/zoo.cfg: zoo.cfg extract $(TOOR)
