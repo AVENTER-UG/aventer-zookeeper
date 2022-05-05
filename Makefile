@@ -29,7 +29,6 @@ help:
 	@exit 0
 
 FPM_OPTS := -s dir -n $(NAME) -v $(PKG_VER) \
-	-d 'java >= 1.6' \
 	--conflicts zookeeper \
 	--conflicts zookeeper-server \
 	--conflicts mesosphere-zookeeper \
