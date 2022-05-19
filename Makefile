@@ -1,4 +1,4 @@
-NAME      ?= aventer-zookeeper
+NAME      ?= zookeeper
 SHELL     := /bin/bash
 EMPTY     :=
 SPACE     := $(EMPTY) $(EMPTY)
